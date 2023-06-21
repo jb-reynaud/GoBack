@@ -4,7 +4,8 @@ A sandbox project to test cool backend features.
 
 ## Requirements & Installation
 - [Docker Desktop](https://www.docker.com/)
-- [Golang Migrate Cli](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
+- [Golang Migrate Cli](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate) - Db migrations
+- [Sqlc](https://docs.sqlc.dev/en/stable/index.html) - ORM
 ```bash
 make install
 ```
