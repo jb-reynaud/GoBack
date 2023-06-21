@@ -5,10 +5,11 @@
 
 install: ## Install the project locally.
 	brew upgrade
-	brew install docker golang-migrate sqlc
+	brew install docker golang-migrate sqlc go
 	docker-compose pull
 	docker-compose up -d --build
 	make db-migration-run
+	go mod download
 
 start: ## Start the project.
 	docker-compose start
@@ -27,6 +28,11 @@ db-migration-run: ## Run DB migrations.
 
 db-orm-generate: ## Generate CRUD ORM according to DB.
 	sqlc generate
+
+##
+##> Database specific
+test-run:
+	go test -cover ./...
 
 .DEFAULT_GOAL := help
 help:
