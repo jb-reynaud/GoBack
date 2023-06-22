@@ -83,10 +83,43 @@ func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (Trans
 			return err
 		}
 
+		result.FromAccount, result.ToAccount, err = addAmount(ctx, q, arg.FromAccountID, arg.ToAccountID, arg.Amount)
+
 		return nil
 	})
 
-	// Todo: update balance.
-
 	return result, err
+}
+
+func addAmount(
+	ctx context.Context,
+	q *Queries,
+	fromAccountID int64,
+	toAccountID int64,
+	amount int64,
+) (fromAccount Account, toAccount Account, err error) {
+	if fromAccountID < toAccountID {
+		// Prevent deadlock.
+		toAccount, fromAccount, err = addAmount(ctx, q, toAccountID, fromAccountID, -amount)
+
+		return fromAccount, toAccount, err
+	}
+
+	fromAccount, err = q.UpdateAccountBalance(ctx, UpdateAccountBalanceParams{
+		ID:     fromAccountID,
+		Amount: -amount,
+	})
+	if err != nil {
+		return
+	}
+
+	toAccount, err = q.UpdateAccountBalance(ctx, UpdateAccountBalanceParams{
+		ID:     toAccountID,
+		Amount: amount,
+	})
+	if err != nil {
+		return
+	}
+
+	return fromAccount, toAccount, err
 }

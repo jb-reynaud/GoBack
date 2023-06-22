@@ -40,6 +40,7 @@ func TestStore_TransferTx(t *testing.T) {
 		}()
 	}
 
+	existed := make(map[int]bool)
 	for i := 0; i < concurrentTransactionsTotal; i++ {
 		err := <-errs
 		require.NoError(t, err)
@@ -76,7 +77,33 @@ func TestStore_TransferTx(t *testing.T) {
 		_, err = store.GetEntry(context.Background(), result.ToEntry.ID)
 		require.NoError(t, err)
 
-		// Check balance.
-		// Todo: check balance.
+		// Check accounts.
+		require.NotEmpty(t, result.FromAccount)
+		require.Equal(t, account1.ID, result.FromAccount.ID)
+
+		require.NotEmpty(t, result.ToAccount)
+		require.Equal(t, account2.ID, result.ToAccount.ID)
+
+		// Check Balance.
+		diff1 := account1.Balance - result.FromAccount.Balance
+		diff2 := account2.Balance - result.ToAccount.Balance
+		require.Equal(t, diff1, -diff2)
+		require.True(t, diff1 > 0)
+		require.True(t, diff1%amount == 0) // 1 * amount, 2 * amount, ..., n * amount.
+
+		k := int(diff1 / amount)
+		require.True(t, k > 0 && k <= concurrentTransactionsTotal)
+		require.NotContains(t, existed, k)
+		existed[k] = true
 	}
+
+	// Check the final updated Balances.
+	updateAccount1, err := testQueries.GetAccount(context.Background(), account1.ID)
+	require.NoError(t, err)
+
+	updateAccount2, err := testQueries.GetAccount(context.Background(), account2.ID)
+	require.NoError(t, err)
+
+	require.Equal(t, account1.Balance-int64(concurrentTransactionsTotal)*amount, updateAccount1.Balance)
+	require.Equal(t, account2.Balance+int64(concurrentTransactionsTotal)*amount, updateAccount2.Balance)
 }
