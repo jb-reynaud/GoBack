@@ -30,7 +30,7 @@ db-orm-generate: ## Generate CRUD ORM according to DB.
 	sqlc generate
 
 ##
-##> Database specific
+##> Test specific
 test-run:
 	go test -cover ./...
 
