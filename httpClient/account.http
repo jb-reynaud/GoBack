@@ -1,0 +1,14 @@
+### List accounts.
+GET {{server}}/accounts?limit=100&offset=5
+
+### Get an account.
+GET {{server}}/accounts/1
+
+### Create an account.
+POST {{server}}/account
+Content-Type: application/x-www-form-urlencoded
+
+{
+"owner": "James Bond",
+"currency": "COP"
+}
