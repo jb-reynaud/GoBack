@@ -2,7 +2,6 @@
 
 ##
 ##> Dev
-
 install: ## Install the project locally.
 	brew upgrade
 	brew install docker golang-migrate sqlc go
@@ -13,13 +12,18 @@ install: ## Install the project locally.
 
 start: ## Start the project.
 	docker-compose start
+	make server-start
 
 stop: ## Stop the project.
 	docker-compose stop
 
 ##
-##> Database specific
+##> Server specific
+server-start: ## Start the server.
+	go run main.go
 
+##
+##> Database specific
 db-migration-create: ## Create DB migrations files.
 	migrate create -ext sql -dir db/migrations -seq ${MIGRATION_NAME}
 
