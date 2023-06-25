@@ -35,7 +35,7 @@ db-orm-generate: ## Generate CRUD ORM according to DB.
 
 ##
 ##> Test specific
-test-run:
+test-run: ## Run tests.
 	go test -cover ./...
 
 .DEFAULT_GOAL := help
